@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\User\UserRepositoryInterfaces;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -19,9 +20,25 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $keyword = $request->keyword;
+        $status = $request->status;
+
+        if ($keyword) {
+            // $params['where'] = ['email', 'LIKE', "%$filter%"];
+            if ($status) {
+                // $params['where']
+            } else {
+                // $params['where'] 
+            }
+        }
+        
+        $params['paginate'] = 10;
+
+        $data_user = $this->userRepository->getAllData($params);
+
+        return view('users.index', compact('data_user'));
     }
 
     /**
@@ -68,7 +85,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = $this->userRepository->getByPrimaryKey($id);
+
+        return view('users.show', compact('user'));
     }
 
     /**
@@ -79,7 +98,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = $this->userRepository->getByPrimaryKey($id);
+
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -91,7 +112,25 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->except(['roles', 'avatar']);
+        $data['roles'] = json_encode($request->roles);
+
+        if ($request->file('avatar')) {
+            $user = $this->userRepository->getByPrimaryKey($id);
+            if ($user->avatar && file_exists(storage_path('app/public/'.$user->avatar))) {
+                Storage::delete('public/'.$user->avatar);
+            }
+            $file = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $file;
+        }
+
+        $update = $this->userRepository->updateByPrimaryKey($id, $data);
+
+        if ($update) {
+            return redirect()->route('users.edit', $id)->with('status', 'User succesfully updated !');
+        } else {
+            return redirect()->route('users.edit', $id)->with('status', 'User unsuccesfully updated !');
+        }
     }
 
     /**
@@ -102,6 +141,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $destroy = $this->userRepository->deleteByPrimaryKey($id);
+
+        if ($destroy) {
+            return redirect()->route('users.index')->with('status', 'User succesfully deleted !');
+        } else {
+            return redirect()->route('users.index')->with('status', 'User unsuccesfully deleted !');
+        }
+        
     }
 }
