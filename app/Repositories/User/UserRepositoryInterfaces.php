@@ -8,7 +8,7 @@ use App\Repositories\BaseRepositoryInterface;
 /**
  * Class UserRepositoryInterfaces.
  */
-class UserRepositoryInterfaces extends BaseRepositoryInterface
+interface UserRepositoryInterfaces extends BaseRepositoryInterface
 {
     /**
      * @return string
