@@ -92,7 +92,7 @@ Users list
     <tfoot>
         <tr>
             <td colspan=10>
-                {{$user->appends(Request::all())->links()}}
+                {{$data_user->appends(Request::all())->links()}}
             </td>
         </tr>
     </tfoot>

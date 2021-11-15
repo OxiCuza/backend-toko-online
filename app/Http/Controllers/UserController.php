@@ -13,7 +13,7 @@ class UserController extends Controller
 
     function __construct(UserRepositoryInterfaces $userRepository)
     {
-        $this->userRepository = $userRepository;    
+        $this->userRepository = $userRepository;
     }
     /**
      * Display a listing of the resource.
@@ -26,16 +26,12 @@ class UserController extends Controller
         $status = $request->status;
 
         if ($keyword) {
-            // $params['where'] = ['email', 'LIKE', "%$filter%"];
-            if ($status) {
-                // $params['where']
-            } else {
-                // $params['where'] 
-            }
+             $params['where'] = ['email', 'LIKE', "%$keyword%"];
         }
-        
+        if ($status) {
+             $params['where'] = ['status', $status];
+        }
         $params['paginate'] = 10;
-
         $data_user = $this->userRepository->getAllData($params);
 
         return view('users.index', compact('data_user'));
@@ -148,6 +144,6 @@ class UserController extends Controller
         } else {
             return redirect()->route('users.index')->with('status', 'User unsuccesfully deleted !');
         }
-        
+
     }
 }

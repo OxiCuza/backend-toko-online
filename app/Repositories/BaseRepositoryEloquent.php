@@ -127,6 +127,14 @@ class BaseRepositoryEloquent
             return $this->model->find($params['find']);
         }
 
+        if (isset($params['only_trashed'])) {
+            return $this->model->onlyTrashed();
+        }
+
+        if (isset($params['with_trashed'])) {
+            return $this->model->withTrashed();
+        }
+
         if(isset($params['paginate'])){
             return $this->model->paginate($params['paginate']);
         }
@@ -140,6 +148,7 @@ class BaseRepositoryEloquent
 
             return $this->model->offset($offset)->limit($params['limit'])->get();
         }
+
         return $this->model->get();
 
         /* End Bawah Sendiri */
