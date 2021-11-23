@@ -26,7 +26,9 @@ class CategoryController extends Controller
         try {
             $keyword = $request->get('name');
             if($keyword){
-                $params['where'] = ['name', 'LIKE', "$keyword"];
+                $params['where'] = [
+                    ['name', 'LIKE', "%$keyword%"]
+                ];
             }
 
             $params['paginate'] = 10;
@@ -46,7 +48,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('categories.index');
+        return view('categories.create');
     }
 
     /**
@@ -59,11 +61,9 @@ class CategoryController extends Controller
     {
         DB::beginTransaction();
         try {
-            $name = $request->only('name');
             $form = $request->except('image');
-            $form['name'] = $name;
             $form['created_by'] = Auth::user()->id;
-            $form['slug'] = \Str::slug($name, '-');
+            $form['slug'] = \Str::slug($form['name'], '-');
 
             if ($request->file('image')) {
                 $img_path = $request->file('image')->store('category_images', 'public');
@@ -180,12 +180,15 @@ class CategoryController extends Controller
         try {
             $keyword = $request->get('name');
             if($keyword){
-                $params['where'] = ['name', 'LIKE', "$keyword"];
+                $params['where'] = [
+                    ['name', 'LIKE', "%$keyword%"]
+                ];
             }
 
             $params['only_trashed'] = true;
             $params['paginate'] = 10;
-            $trashed_categories = $this->categoryRepository->getAllData($params);
+//            $trashed_categories = $this->categoryRepository->getAllData($params);
+            $trashed_categories = \App\Models\Category::onlyTrashed()->paginate(10);
 
             return view('categories.trash', compact('trashed_categories'));
 

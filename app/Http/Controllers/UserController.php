@@ -25,12 +25,16 @@ class UserController extends Controller
         $keyword = $request->keyword;
         $status = $request->status;
 
-        if ($keyword) {
-             $params['where'] = ['email', 'LIKE', "%$keyword%"];
-        }
         if ($status) {
-             $params['where'] = ['status', $status];
+            $params['where'] = [
+                ['status', $status]
+            ];
         }
+
+        if ($keyword) {
+            array_push($params['where'], ['email', 'like', "%$keyword%"]);
+        }
+
         $params['paginate'] = 10;
         $data_user = $this->userRepository->getAllData($params);
 

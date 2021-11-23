@@ -106,13 +106,13 @@
                     </tr>
                 @endforeach
                 </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colSpan="10">
-                                {{$categories->appends(Request::all())->links()}}
-                            </td>
-                        </tr>
-                    </tfoot>
+                <tfoot>
+                    <tr>
+                        <td colSpan="10">
+                            {{$categories->appends(Request::all())->links()}}
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
