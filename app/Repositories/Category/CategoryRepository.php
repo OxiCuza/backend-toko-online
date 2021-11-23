@@ -33,7 +33,7 @@ class CategoryRepository extends BaseRepositoryEloquent implements CategoryRepos
                 return 'Category successfully restored';
 
             } else {
-                return 'Category is not in trash';
+                throw new \Exception('Category is not in trash');
             }
 
         } catch (\Exception $error) {
