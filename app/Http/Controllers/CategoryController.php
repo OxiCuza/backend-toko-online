@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Repositories\Category\CategoryRepositoryInterfaces;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -215,6 +216,17 @@ class CategoryController extends Controller
             $category = $this->categoryRepository->deletePermanent($id);
 
             return redirect()->route('categories.index')->with('status', $category);
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
+    }
+
+    public function ajaxSearch (Request $request)
+    {
+        try {
+            $keyword = $request->get('q');
+            return Category::where("name", "like", "%$keyword%")->get();
 
         } catch (\Exception $error) {
             return $error->getMessage();

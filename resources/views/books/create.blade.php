@@ -1,5 +1,27 @@
 @extends('layouts.global')
 
+@section('footer-scripts')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script>
+        $('#categories').select2({
+            ajax: {
+                url: `{{url('ajax/categories/search')}}`,
+                processResults: function(data){
+                    return {
+                        results: data.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: item.name
+                            }
+                        })
+                    }
+                }
+            }
+        });
+    </script>
+@endsection
+
 @section('title') Create book @endsection
 
 @section('content')
@@ -31,6 +53,15 @@
                 <label for="description">Description</label><br>
                 <textarea name="description" id="description" class="form-control"
                           placeholder="Give a description about this book"></textarea>
+                <br>
+
+                <label for="categories">Categories</label><br>
+                <select
+                    name="categories[]"
+                    multiple
+                    id="categories"
+                    class="form-control">
+                </select>
                 <br>
 
                 <label for="stock">Stock</label><br>

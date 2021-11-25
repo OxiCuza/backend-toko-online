@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,19 +11,22 @@ use Illuminate\Support\Str;
 class BookController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
      */
     public function index()
     {
-        //
+        try {
+            $books = Book::with('categories')->paginate(10);
+
+            return view('books.index', compact('books'));
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -30,10 +34,8 @@ class BookController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|string
      */
     public function store(Request $request)
     {
@@ -49,12 +51,20 @@ class BookController extends Controller
                 $form['cover'] = $cover_path;
             }
 
-//            $store = $this->
-
-//            if ()
-
+            $new_book = new Book();
+            $new_book = $new_book->fill($form);
+            $new_book->save();
+            $new_book->categories()->attach($request->get('categories'));
 
             DB::commit();
+
+            if ($request->get('save_action') == 'PUBLISH') {
+                return redirect()->route('books.create')->with('status', 'Book successfully saved and published');
+
+            } else {
+                return redirect()->route('books.create')->with('status', 'Book saved as a draft');
+
+            }
 
         } catch (\Exception $error) {
             DB::rollBack();
@@ -74,14 +84,19 @@ class BookController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
      */
     public function edit($id)
     {
-        //
+        try {
+            $book = Book::find($id);
+
+            return view('books.edit', compact('book'));
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
     }
 
     /**
