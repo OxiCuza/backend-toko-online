@@ -6,6 +6,7 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BookController extends Controller
@@ -13,10 +14,17 @@ class BookController extends Controller
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $books = Book::with('categories')->paginate(10);
+            $books = Book::with('categories');
+
+            $status = $request->get('status');
+            if ($status) {
+                $books->where('status', $status);
+            }
+
+            $books = $books->paginate(10);
 
             return view('books.index', compact('books'));
 
@@ -100,25 +108,108 @@ class BookController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|string
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $update_book = $request->except('cover');
+            $update_book['updated_by'] = Auth::id();
+
+            $book = Book::find($id);
+
+            if ($request->hasFile('cover')) {
+                if ($book->cover && file_exists(storage_path("app/public/$book->cover"))) {
+                    Storage::delete("public/$book->cover");
+                }
+                $new_path = $request->file('cover')->store('book-covers', 'public');
+                $update_book['cover'] = $new_path;
+            }
+
+            $book->fill($update_book);
+            $book->save();
+            $book->categories()->sync($request->get('categories'));
+
+            return redirect()->route('books.edit', $book->id)->with('status', 'Book successfully updated');
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|string
      */
     public function destroy($id)
     {
-        //
+        try {
+            Book::find($id)->delete();
+
+            return redirect()->route('books.index')->with('status', 'Book moved to trash');
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
+    }
+
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
+     */
+    public function trash()
+    {
+        try {
+            $books = Book::onlyTrashed()->paginate(10);
+
+            return view('books.trash', compact('books'));
+
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
+
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|string
+     */
+    public function restore($id)
+    {
+        try {
+            $book = Book::withTrashed()->find($id);
+
+            if ($book->trashed()) {
+                $book->restore();
+                return redirect()->route('books.trash')->with('status', 'Book sucessfully restored');
+
+            } else {
+                return redirect()->route('books.trash')->with('status', 'Book is not in trash');
+
+            }
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
+
+    }
+
+    public function deletePermanent($id)
+    {
+        try {
+            $book = Book::withTrashed()->find($id);
+
+            if ($book->trashed()) {
+                $book->categories()->detach();
+                $book->forceDelete();
+
+                return redirect()->route('books.trash')->with('status', 'Book permanently deleted !');
+            } else {
+                return redirect()->route('books.trash')->with('status', 'Book is not in trash !')->with('status_type', 'alert');
+            }
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
+
     }
 }

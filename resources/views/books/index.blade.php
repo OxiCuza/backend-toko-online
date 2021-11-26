@@ -15,6 +15,47 @@
                 </div>
             </div>
 
+            @if(session('status'))
+                <div class="alert alert-success">
+                    {{session('status')}}
+                </div>
+            @endif
+
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="nav nav-pills card-header-pills">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link {{Request::get('status') == NULL && Request::path() == 'books' ? 'active' : ''}}"
+                                href="{{route('books.index')}}">
+                                All
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link {{Request::get('status') == 'PUBLISH' ? 'active' : '' }}"
+                                href="{{route('books.index', ['status' => 'PUBLISH'])}}">
+                                Publish
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link {{Request::get('status') == 'DRAFT' ? 'active' : '' }}"
+                                href="{{route('books.index', ['status' => 'DRAFT'])}}">
+                                Draft
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link {{Request::path() == 'books/trash' ? 'active' : ''}}"
+                                href="{{route('books.trash')}}">
+                                Trash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             <table class="table table-bordered table-stripped">
                 <thead>
                     <tr>
@@ -92,6 +133,23 @@
                                 class="btn btn-info btn-sm" >
                                 Edit
                             </a>
+
+                            <form
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('Move book to trash?')"
+                                action="{{route('books.destroy', [$book->id])}}"
+                            >
+                                @csrf
+                                <input
+                                    type="hidden"
+                                    value="DELETE"
+                                    name="_method">
+                                <input
+                                    type="submit"
+                                    value="Trash"
+                                    class="btn btn-danger btn-sm">
+                            </form>
                         </td>
                     </tr>
                 @endforeach
