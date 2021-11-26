@@ -15,8 +15,8 @@ class CreateBookCategoryTable extends Migration
     {
         Schema::create('book_category', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->nullable();
-            $table->foreignId('category_id')->nullable();
+            $table->foreignId('book_id')->nullable()->constrained('books');
+            $table->foreignId('category_id')->nullable()->constrained('categories');
             $table->timestamps();
         });
     }

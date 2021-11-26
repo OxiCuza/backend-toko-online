@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +17,8 @@ use Illuminate\Support\Str;
 class BookController extends Controller
 {
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
+     * @param Request $request
+     * @return Application|Factory|View|string
      */
     public function index(Request $request)
     {
@@ -20,21 +26,25 @@ class BookController extends Controller
             $books = Book::with('categories');
 
             $status = $request->get('status');
+            $keyword = $request->get('keyword');
             if ($status) {
                 $books->where('status', $status);
+            }
+            if ($keyword) {
+                $books->where("title", "LIKE", "%$keyword%");
             }
 
             $books = $books->paginate(10);
 
             return view('books.index', compact('books'));
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
     public function create()
     {
@@ -43,7 +53,7 @@ class BookController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|string
+     * @return RedirectResponse|string
      */
     public function store(Request $request)
     {
@@ -51,7 +61,7 @@ class BookController extends Controller
         try {
             $form = $request->except('cover');
             $form['slug'] = Str::slug($request->get('title'));
-            $form['created_by'] = Auth::user()->id;
+            $form['created_by'] = Auth::id();
 
             $cover = $request->file('cover');
             if ($cover) {
@@ -74,17 +84,14 @@ class BookController extends Controller
 
             }
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             DB::rollBack();
             return $error->getMessage();
         }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $id
      */
     public function show($id)
     {
@@ -93,7 +100,7 @@ class BookController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
+     * @return Application|Factory|View|string
      */
     public function edit($id)
     {
@@ -102,7 +109,7 @@ class BookController extends Controller
 
             return view('books.edit', compact('book'));
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
     }
@@ -110,7 +117,7 @@ class BookController extends Controller
     /**
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|string
+     * @return RedirectResponse|string
      */
     public function update(Request $request, $id)
     {
@@ -134,14 +141,14 @@ class BookController extends Controller
 
             return redirect()->route('books.edit', $book->id)->with('status', 'Book successfully updated');
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
     }
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|string
+     * @return RedirectResponse|string
      */
     public function destroy($id)
     {
@@ -150,13 +157,13 @@ class BookController extends Controller
 
             return redirect()->route('books.index')->with('status', 'Book moved to trash');
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
+     * @return Application|Factory|View|string
      */
     public function trash()
     {
@@ -165,7 +172,7 @@ class BookController extends Controller
 
             return view('books.trash', compact('books'));
 
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
 
@@ -173,7 +180,7 @@ class BookController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|string
+     * @return RedirectResponse|string
      */
     public function restore($id)
     {
@@ -182,13 +189,13 @@ class BookController extends Controller
 
             if ($book->trashed()) {
                 $book->restore();
-                return redirect()->route('books.trash')->with('status', 'Book sucessfully restored');
+                return redirect()->route('books.trash')->with('status', 'Book successfully restored');
 
             } else {
                 return redirect()->route('books.trash')->with('status', 'Book is not in trash');
 
             }
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
 
@@ -207,7 +214,7 @@ class BookController extends Controller
             } else {
                 return redirect()->route('books.trash')->with('status', 'Book is not in trash !')->with('status_type', 'alert');
             }
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             return $error->getMessage();
         }
 
