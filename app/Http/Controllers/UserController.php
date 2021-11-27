@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\User\UserRepositoryInterfaces;
-use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest as Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 

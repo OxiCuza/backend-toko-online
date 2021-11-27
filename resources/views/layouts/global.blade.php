@@ -91,6 +91,13 @@
                             Manage Books
                         </a>
                     </li>
+                    <li>
+                        <a href="{{route('orders.index')}}">
+                            <span class="oi oi-inbox"></span>
+                            Manage Orders
+                        </a>
+                    </li>
+
                     <div class="d-block d-md-none">
                         <div class="dropdown-divider"></div>
                         <li><a href="#"> Profile</a></li>
@@ -102,6 +109,7 @@
                             </form>
                         </li>
                     </div>
+
                 </ul>
                 <div class="pl-3 d-none d-md-block position-fixed" style="bottom: 0px">
                     <span class="oi oi-cog"></span> Setting
