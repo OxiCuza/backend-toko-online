@@ -104,10 +104,10 @@
                                 {{$order->totalQuantity}} pc (s)
                             </td>
                             <td>
-                                {{$order->created_at}}
+                                {{\Carbon\Carbon::parse($order->created_at)->isoFormat('DD MMMM YYYY HH:mm')}}
                             </td>
                             <td>
-                                {{$order->total_price}}
+                                Rp. {{number_format($order->total_price, 2, ',', '.')}}
                             </td>
                             <td>
                                 <a href="{{route('orders.edit', [$order->id])}}" class="btn btn-info btn-sm"> Edit</a>

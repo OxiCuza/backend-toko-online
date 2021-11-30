@@ -20,15 +20,19 @@
             >
                 @csrf
                 @method('PUT')
+
                 <label for="title">Title</label><br>
                 <input
                     type="text"
                     id="title"
-                    class="form-control"
-                    value="{{$book->title}}"
+                    class="form-control {{$errors->first('title') ? 'is-invalid' : '' }}"
+                    value="{{old('title') ? old('title') : $book->title}}"
                     name="title"
                     placeholder="Book title"
                 />
+                <div class="invalid-feedback">
+                    {{$errors->first('title')}}
+                </div>
                 <br>
 
                 <label for="cover">Cover</label><br>
@@ -46,7 +50,7 @@
                     type="file"
                     class="form-control"
                     name="cover"
-                >
+                />
                 <small class="text-muted">
                     Kosongkan jika tidak ingin mengubah cover
                 </small>
@@ -57,20 +61,21 @@
                 <input
                     type="text"
                     id="slug"
-                    class="form-control"
-                    value="{{$book->slug}}"
+                    class="form-control {{$errors->first('slug') ? 'is-invalid' : ''}}"
+                    value="{{old('slug') ? old('slug') : $book->slug}}"
                     name="slug"
                     placeholder="enter-a-slug"
                 />
+                <div class="invalid-feedback">
+                    {{$errors->first('slug')}}
+                </div>
                 <br>
 
                 <label for="description">Description</label> <br>
                 <textarea
                     name="description"
                     id="description"
-                    class="form-control">
-                    {{$book->description}}
-                </textarea>
+                    class="form-control {{$errors->first('desciption') ? 'is-invalid' : ''}}">{{old('description') ? old('description') : $book->description}}</textarea>
                 <br>
 
                 <label for="categories">Categories</label>
@@ -86,41 +91,50 @@
                 <label for="stock">Stock</label><br>
                 <input
                     type="text"
-                    class="form-control"
+                    class="form-control {{$errors->first('stock') ? 'is-invalid' : ''}}"
                     placeholder="Stock"
                     id="stock"
                     name="stock"
-                    value="{{$book->stock}}">
+                    value="{{old('stock') ? old('stock') : $book->stock}}" />
                 <br>
+                <div class="invalid-feedback">
+                    {{$errors->first('stock')}}
+                </div>
 
                 <label for="author">Author</label>
                 <input
                     placeholder="Author"
-                    value="{{$book->author}}"
+                    value="{{old('author') ? old('author') : $book->author}}"
                     type="text"
                     id="author"
                     name="author"
-                    class="form-control">
+                    class="form-control {{$errors->first('author') ? 'is-invalid' : ''}}" />
+                <div class="invalid-feedback">
+                    {{$errors->first('author')}}
+                </div>
                 <br>
 
                 <label for="publisher">Publisher</label><br>
                 <input
-                    class="form-control"
+                    class="form-control {{$errors->first('publisher') ? 'is-invalid' : ''}}"
                     type="text"
                     placeholder="Publisher"
                     name="publisher"
                     id="publisher"
-                    value="{{$book->publisher}}">
+                    value="{{old('publisher') ? old('publisher') : $book->publisher}}" />
+                <div class="invalid-feedback">
+                    {{$errors->first('publisher')}}
+                </div>
                 <br>
 
                 <label for="price">Price</label><br>
                 <input
                     type="text"
-                    class="form-control"
+                    class="form-control {{$errors->first('price') ? 'is-invalid' : ''}}"
                     name="price"
                     placeholder="Price"
                     id="price"
-                    value="{{$book->price}}">
+                    value="{{old('price') ? old('price') : $book->price}}" />
                 <br>
 
                 <label for="status">Status</label>

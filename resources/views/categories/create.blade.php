@@ -16,18 +16,28 @@
         method="POST">
         @csrf
 
-        <label>Category name</label>
+        <label for="name">Category name</label>
         <br>
         <input
             type="text"
-            class="form-control"
+            class="form-control {{$errors->first('name') ? 'is-invalid' : ''}}"
+            value="{{old('name')}}"
+            id="name"
             name="name" />
+        <div class="invalid-feedback">
+            {{$errors->first('name')}}
+        </div>
         <br>
-        <label>Category image</label>
+
+        <label for="image">Category image</label>
         <input
+            id="image"
             type="file"
-            class="form-control"
+            class="form-control {{$errors->first('image') ? 'is-invalid' : ''}}"
             name="image" />
+        <div class="invalid-feedback">
+            {{$errors->first('image')}}
+        </div>
         <br>
         <input
             type="submit"

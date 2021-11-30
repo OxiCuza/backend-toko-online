@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UserRequest extends FormRequest
+class CategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,9 +17,10 @@ class UserRequest extends FormRequest
         return true;
     }
 
-
     /**
+     * Get the validation rules that apply to the request.
      *
+     * @return array
      */
     public function rules()
     {
@@ -32,8 +34,9 @@ class UserRequest extends FormRequest
                 $this->rulesUpdate();
                 break;
 
-            default:break;
-        };
+            default: break;
+        }
+
     }
 
     /**
@@ -42,14 +45,8 @@ class UserRequest extends FormRequest
     public function rulesStore()
     {
         return [
-            'name' => 'required|min:5|max:100',
-            'email' => 'required|email|unique:users',
-            'password' => 'required',
-            'password_confirmation' => 'required|same:password',
-            'username' => 'required|unique:users',
-            'address' => 'required',
-            'phone' => 'required|digits_between:10,12',
-            'avatar' => 'required',
+            'name' => 'required|min:3|max:20',
+            'image' => 'required',
         ];
     }
 
@@ -59,10 +56,9 @@ class UserRequest extends FormRequest
     public function rulesUpdate()
     {
         return [
-            'name' => 'required|min:5|max:100',
-            'address' => 'required',
-            'phone' => 'required|digits_between:10,12',
-            'roles' => 'required',
+            'name' => 'required|min:3|max:20',
+            'image' => 'required',
+            'slug' => 'required',
         ];
     }
 }
