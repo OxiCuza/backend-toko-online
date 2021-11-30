@@ -4,9 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (Gate::allows('manage-orders')) return $next($request);
+            abort(403, 'Anda tidak memiliki hak akses !');
+        });
+    }
 
     public function index(Request $request)
     {

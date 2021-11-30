@@ -8,14 +8,23 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Http\Requests\BookRequest as Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+           if (Gate::allows('manage-books')) return $next($request);
+           abort(403, 'Anda tidak memiliki hak akses !');
+        });
+    }
+
     /**
      * @param Request $request
      * @return Application|Factory|View|string

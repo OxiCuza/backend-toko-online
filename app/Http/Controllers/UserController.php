@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\User\UserRepositoryInterfaces;
 use App\Http\Requests\UserRequest as Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,6 +14,10 @@ class UserController extends Controller
 
     function __construct(UserRepositoryInterfaces $userRepository)
     {
+        $this->middleware(function ($request, $next) {
+           if (Gate::allows('manage-users')) return $next($request);
+           abort(403, 'Anda tidak memiliki akses !');
+        });
         $this->userRepository = $userRepository;
     }
     /**

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Repositories\Category\CategoryRepositoryInterfaces;
-use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest as Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -15,6 +16,10 @@ class CategoryController extends Controller
 
     public function __construct(CategoryRepositoryInterfaces $categoryRepository)
     {
+        $this->middleware(function ($request, $next) {
+           if (Gate::allows('manage-categories')) return $next($request);
+           abort(403, 'Anda tidak memiliki hak akses !');;
+        });
         $this->categoryRepository = $categoryRepository;
     }
     /**
